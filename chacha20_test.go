@@ -60,6 +60,7 @@ func Test_keyStream(t *testing.T) {
 	}
 	for _, v := range keyStreamTestVectors {
 		t.Run(v.name, func(t *testing.T) {
+			t.Parallel()
 			x := NewCipher(v.key, v.counter, v.nonce)
 			if got := x.keyStream(); !reflect.DeepEqual(got, v.keyStream) {
 				t.Errorf("Cipher.keyStream()\ngot:  %s\nwant: %s", hex.EncodeToString(got[:64]), hex.EncodeToString(v.keyStream[:64]))
@@ -101,9 +102,18 @@ func Test_state_XORKeyStream(t *testing.T) {
 			plaintext:  mustDecodeHex("2754776173206272696c6c69672c20616e642074686520736c6974687920746f7665730a446964206779726520616e642067696d626c6520696e2074686520776162653a0a416c6c206d696d737920776572652074686520626f726f676f7665732c0a416e6420746865206d6f6d65207261746873206f757467726162652e"),
 			ciphertext: mustDecodeHex("62e6347f95ed87a45ffae7426f27a1df5fb69110044c0d73118effa95b01e5cf166d3df2d721caf9b21e5fb14c616871fd84c54f9d65b283196c7fe4f60553ebf39c6402c42234e32a356b3e764312a61a5532055716ead6962568f87d3f3f7704c6a8d1bcd1bf4d50d6154b6da731b187b58dfd728afa36757a797ac188d1"),
 		},
+		{
+			name:       "RFC8439 Section 2.8.2 (AEAD Test Vector)",
+			key:        [32]byte(mustDecodeHex("808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f")),
+			nonce:      [12]byte(mustDecodeHex("070000004041424344454647")),
+			counter:    0x00000001,
+			plaintext:  []byte("Ladies and Gentlemen of the class of '99: If I could offer you only one tip for the future, sunscreen would be it."),
+			ciphertext: mustDecodeHex("d31a8d34648e60db7b86afbc53ef7ec2a4aded51296e08fea9e2b5a736ee62d63dbea45e8ca9671282fafb69da92728b1a71de0a9e060b2905d6a5b67ecd3b3692ddbd7f2d778b8c9803aee328091b58fab324e4fad675945585808b4831d7bc3ff4def08e4b7a9de576d26586cec64b6116"),
+		},
 	}
 	for _, v := range encryptionTestVectors {
 		t.Run(v.name, func(t *testing.T) {
+			t.Parallel()
 			x := NewCipher(v.key, v.counter, v.nonce)
 			got := make([]byte, len(v.plaintext))
 			x.XORKeyStream(got, v.plaintext)

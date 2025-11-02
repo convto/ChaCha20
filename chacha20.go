@@ -86,10 +86,7 @@ func (c *Cipher) keyStream() [64]byte {
 	}
 	var stream [64]byte
 	for i, v := range x {
-		stream[i*4] = byte(v)
-		stream[i*4+1] = byte(v >> 8)
-		stream[i*4+2] = byte(v >> 16)
-		stream[i*4+3] = byte(v >> 24)
+		binary.LittleEndian.PutUint32(stream[i*4:i*4+4], v)
 	}
 	return stream
 }
