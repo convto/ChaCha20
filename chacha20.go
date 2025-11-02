@@ -37,6 +37,10 @@ func NewCipher(key [32]byte, count uint32, nonce [12]byte) *Cipher {
 	return c
 }
 
+func (c *Cipher) SetCounter(counter uint32) {
+	c.counter = counter
+}
+
 func (c *Cipher) toState() [16]uint32 {
 	return [16]uint32{
 		c.constant[0], c.constant[1], c.constant[2], c.constant[3],
